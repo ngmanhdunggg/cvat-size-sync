@@ -1,7 +1,7 @@
 /* Injected only after opening the extension; no annotation writes on load. */
 (() => {
     'use strict';
-    if (window.CVATSizeSync?.version === '1.1.2') return;
+    if (window.CVATSizeSync?.version === '1.1.3') return;
     window.CVATSizeWidget?.destroy();
     let bridge;
     let busy = false;
@@ -69,7 +69,13 @@
         // Preflight every keyframe before writing any state. Only set the points field.
         for (const change of changes) {
             const s = await at(job, id, change.frame);
-            if (JSON.stringify(s.points) !== JSON.stringify(change.before)) throw Error('Track đã được chỉnh sửa. Hãy đọc lại thông tin.');
+            // Compare serialized keyframes with the serialized plan. CVAT's
+            // displayed state may interpolate/normalize angles even at a keyframe.
+            const track = await s.export();
+            const shape = track.shapes.find((v) => v.frame === change.frame);
+            if (!shape || JSON.stringify(shape.points) !== JSON.stringify(change.before)) {
+                throw Error('Track đã được chỉnh sửa. Hãy chọn lại object rồi thử lại.');
+            }
         }
         const applied = [];
         try {
@@ -137,5 +143,5 @@
             finally { shield.remove(); document.removeEventListener('keydown', stopKeys, true); busy = false; }
         }
     }
-    window.CVATSizeSync = { execute, version: '1.1.2' };
+    window.CVATSizeSync = { execute, version: '1.1.3' };
 })();

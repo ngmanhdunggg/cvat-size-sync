@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const math = require('./size-sync.js');
 const points = (size) => [1, 2, 3, 0.1, 0.2, 0.3, ...size, 0, 0, 0, 0, 0, 0, 0];
-function fixture(failAt = null) {
+function fixture(failAt = null, normalizeAngles = false) {
     const shapes = [0, 4, 8].map((frame) => ({ frame, type: 'cuboid',
         points: points(frame === 4 ? [4, 2, 1.5] : [5, 3, 2]), outside: frame === 8,
         occluded: true, attributes: [{ spec_id: 1, value: 'x' }], rotation: 0 }));
@@ -18,8 +18,14 @@ function fixture(failAt = null) {
     frames: { get: () => { throw Error('Must not reload point cloud'); } } };
     function state(frame) {
         const s = shapes.find((v) => v.frame === frame);
+        const displayedPoints = s.points.slice();
+        if (normalizeAngles && frame < 8) {
+            for (let i = 3; i < 6; i++) {
+                displayedPoints[i] = (displayedPoints[i] * (180 / Math.PI)) * (Math.PI / 180);
+            }
+        }
         return { clientID: 15, objectType: 'track', shapeType: 'cuboid', keyframe: true,
-            label: { name: 'Pedestrian' }, outside: s.outside, points: s.points.slice(),
+            label: { name: 'Pedestrian' }, outside: s.outside, points: displayedPoints,
             export: async () => ({ shapes: structuredClone(shapes) }),
             async save() {
                 if (fail === frame) { fail = null; throw Error('simulated failure'); }
@@ -91,6 +97,20 @@ test('supports compact and padded 3D data, preserving destination tail exactly',
 test('failed save rolls back already written keyframes', async () => {
     const f = fixture(8);
     await assert.rejects(f.execute('sync'), /simulated failure/);
+    assert.deepEqual(f.shapes, f.original);
+});
+
+test('CVAT angle conversion at keyframes does not falsely block sync or undo', async () => {
+    const f = fixture(null, true);
+    const selected = f.annotation.annotations.states[0];
+    assert.notDeepEqual(selected.points, f.original[1].points);
+    await f.execute('sync');
+    assert.equal(f.count(), 2);
+    for (const shape of f.shapes) {
+        assert.deepEqual(shape.points.slice(6, 9), [4, 2, 1.5]);
+        assert.deepEqual(shape.points.slice(0, 6), f.original.find((s) => s.frame === shape.frame).points.slice(0, 6));
+    }
+    await f.execute('undo');
     assert.deepEqual(f.shapes, f.original);
 });
 test('undo refuses to overwrite subsequent manual edits', async () => {

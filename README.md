@@ -1,6 +1,6 @@
 # CVAT: đồng bộ kích thước cuboid theo track
 
-Tiện ích Chrome/Edge **v1.1.2** hỗ trợ giảm thao tác chỉnh kích thước lặp lại khi annotate LiDAR 3D trong CVAT. Bản thử nghiệm, chưa phát hành trên Chrome Web Store.
+Tiện ích Chrome/Edge **v1.1.3** hỗ trợ giảm thao tác chỉnh kích thước lặp lại khi annotate LiDAR 3D trong CVAT. Bản thử nghiệm, chưa phát hành trên Chrome Web Store.
 
 Tiện ích Chrome/Edge Manifest V3. Chọn một cuboid track tại frame chuẩn rồi bấm **Đồng bộ**. Lấy chính xác ba giá trị kích thước trong dữ liệu CVAT (không làm tròn theo ô hiển thị), áp dụng vào các keyframe đã có của cùng track trong job hiện tại, kể cả keyframe outside. Không tạo keyframe ở frame tham chiếu nếu đó là frame nội suy. CVAT tự nội suy kích thước giữa các keyframe.
 
@@ -69,12 +69,13 @@ Yêu cầu Node.js 18 trở lên, không cần cài package:
 node --test size-sync.test.cjs
 ```
 
-7 kiểm thử mô phỏng đã đạt: chỉ sửa ba chiều, giới hạn job, keyframe outside, mở/đọc không ghi dữ liệu, không lọc nhãn, hỗ trợ mảng tọa độ 9/16 số và giữ dữ liệu đuôi, hoàn tác, khôi phục khi lỗi giữa chừng, từ chối ghi đè chỉnh sửa mới, cập nhật annotation mà không tải lại point cloud.
+8 kiểm thử mô phỏng đã đạt: chỉ sửa ba chiều, giới hạn job, keyframe outside, mở/đọc không ghi dữ liệu, không lọc nhãn, hỗ trợ mảng tọa độ 9/16 số và giữ dữ liệu đuôi, hoàn tác, khôi phục khi lỗi giữa chừng, từ chối ghi đè chỉnh sửa mới, cập nhật annotation mà không tải lại point cloud, không báo nhầm khi CVAT tính lại góc tại keyframe.
 
 Đã kiểm tra bảng nổi trên một phiên CVAT Online thực tế: hiển thị track đang chọn, nhãn và L/W/H. Luồng ghi/hoàn tác có kiểm thử mô phỏng; chưa xác minh đầy đủ toàn bộ keyframe và dữ liệu lưu trên server của phiên Online đó.
 
 ## Thay đổi gần đây
 
+- **1.1.3:** kiểm tra thay đổi bằng tọa độ keyframe gốc từ export, tránh báo nhầm “Track đã được chỉnh sửa” khi CVAT tính lại góc xoay tại keyframe. Giữ nguyên tọa độ/góc gốc khi chỉ đồng bộ L/W/H.
 - **1.1.2:** chỉ cập nhật annotation sau đồng bộ; bỏ tải lại toàn bộ frame/point cloud/camera. Không làm mới canvas khi kích thước đã giống nhau.
 - **1.1.1:** đọc đúng cuboid 3D dùng mảng 16 số, chỉ thay các phần tử 6–8 và giữ nguyên phần còn lại.
 - **1.1.0:** thêm icon và bảng nổi tự cập nhật object đang chọn.
