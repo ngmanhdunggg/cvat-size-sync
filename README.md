@@ -8,13 +8,27 @@ Không giới hạn nhãn: dùng được cho object đang chọn. Chỉ hỗ tr
 
 ## Cài trên Chrome
 
-1. Tải mã nguồn bằng **Code → Download ZIP** trên GitHub và giải nén, hoặc clone repo bằng Git.
+**Không cần cài Node.js, Python hay chạy lệnh để sử dụng tiện ích.**
+
+1. [Tải ZIP của tool](https://github.com/ngmanhdunggg/cvat-size-sync/archive/refs/heads/main.zip), hoặc vào repo chọn **Code → Download ZIP**, rồi giải nén.
 2. Mở `chrome://extensions`, bật **Developer mode / Chế độ dành cho nhà phát triển**.
 3. Bấm **Load unpacked / Tải tiện ích đã giải nén**.
-4. Chọn thư mục vừa giải nén/clone, nơi có file `manifest.json`.
+4. Chọn thư mục `cvat-size-sync-main` vừa giải nén, nơi có file `manifest.json`. Không chọn file ZIP hoặc thư mục cha chứa nó.
 5. Ghim tiện ích (icon khối hộp trắng trên nền xanh) để dễ mở. Edge dùng `edge://extensions` với cùng thư mục.
 
 Nếu đã cài bản cũ: cập nhật mã nguồn, vào `chrome://extensions`, bấm **Reload / Tải lại** ở thẻ tiện ích rồi bấm lại icon trên tab CVAT. Hoàn tất việc hoàn tác cần thiết trước khi cập nhật vì bản hoàn tác cũ có thể mất khi thay mã.
+
+### Cài trên Microsoft Edge
+
+Mở `edge://extensions`, bật **Developer mode**, chọn **Load unpacked** và trỏ tới thư mục có `manifest.json` như trên. Sau đó ghim tiện ích từ menu Extensions trên thanh trình duyệt.
+
+### Nếu dùng Git
+
+```sh
+git clone https://github.com/ngmanhdunggg/cvat-size-sync.git
+```
+
+Chọn chính thư mục `cvat-size-sync` vừa clone khi bấm **Load unpacked**. Những lần cập nhật sau chạy `git pull`, rồi bấm **Reload** ở trang quản lý tiện ích.
 
 ## Sử dụng
 
@@ -29,6 +43,13 @@ Bấm icon nổi hoặc dấu × để thu gọn/mở bảng. Bấm lại icon t
 **Không tự chạy đồng bộ.** Mở tiện ích, chọn object hoặc chuyển frame chỉ đọc dữ liệu. Chỉ nút **Đồng bộ L/W/H** mới áp dụng kích thước; nút **Hoàn tác** chủ động khôi phục lần đồng bộ gần nhất.
 
 Tâm XYZ và góc xoay XYZ giữ nguyên. Khi đổi chiều cao mà giữ tâm, đáy box có thể dịch lên/xuống: hãy kiểm tra độ khớp mặt đường sau đồng bộ. Các trạng thái outside/occluded, thuộc tính, ID và track khác không được chỉnh bởi tiện ích.
+
+## Khi không thấy object hoặc bảng tiện ích
+
+- Không thấy icon: mở menu hình mảnh ghép trên Chrome và ghim **CVAT – Đồng bộ kích thước cuboid**.
+- Chưa có bảng nổi: mở đúng tab job CVAT, chờ tải xong rồi bấm icon tiện ích trên thanh Chrome. Mở một trang mới hoặc tải lại trang sẽ cần bấm icon để bật lại.
+- Bảng yêu cầu chọn track: chọn trực tiếp cuboid 3D dạng **Track**, dừng phát và mở khóa object. Tool không dùng cho Shape độc lập hoặc cuboid 2D.
+- Bảng không đọc được dữ liệu sau cập nhật: kiểm tra đã tải lại tiện ích ở `chrome://extensions` và bấm lại icon trên tab CVAT. Nếu vẫn lỗi, lưu công việc đang làm bằng CVAT trước khi tải lại trang.
 
 ## Hoàn tác và phạm vi
 
@@ -67,3 +88,9 @@ node --test size-sync.test.cjs
 - `size-sync.test.cjs`: kiểm thử bằng fixture, không cần tài khoản CVAT.
 
 Repo chỉ chứa mã tiện ích, icon và kiểm thử tổng hợp; không kèm point cloud, ảnh camera, annotation hoặc thông tin đăng nhập.
+
+## Tác giả và repo đội
+
+@ngmanhdunggg — Nguyễn Mạnh Dũng. Mã được xây dựng với hỗ trợ của Codex.
+
+Bản lưu trong repo đội: [A-018 / source-tool / cvat-size-sync](https://github.com/AI20K-Build-Phase-Cohort-5/A-018/tree/main/source-tool/cvat-size-sync).
